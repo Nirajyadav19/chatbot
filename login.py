@@ -8,17 +8,28 @@ def login_page():
     username = st.text_input("Username")
     password = st.text_input("Password", type="password")
 
-    env_user = os.getenv("APP_USERNAME") or st.secrets["APP_USERNAME"]
-    env_pass = os.getenv("APP_PASSWORD") or st.secrets["APP_PASSWORD"]
+    # ---- Read from .env (local) OR Streamlit Secrets (cloud) ----
+    env_users = os.getenv("APP_USERNAMES")
+    env_passwords = os.getenv("APP_PASSWORDS")
 
+    if env_users and env_passwords:
+        usernames = env_users.split(",")
+        passwords = env_passwords.split(",")
+    else:
+        usernames = st.secrets.get("APP_USERNAMES", [])
+        passwords = st.secrets.get("APP_PASSWORDS", [])
+
+    USER_DB = dict(zip(usernames, passwords))
+
+    # ---- Login Check ----
     if st.button("Login"):
 
-        if username == env_user and password == env_pass:
+        if username in USER_DB and USER_DB[username] == password:
             st.session_state["logged_in"] = True
             st.session_state["user"] = username
-            st.success("Login successful")
+            st.success("Login successful ✅")
             st.rerun()
         else:
-            st.error("Invalid credentials")
+            st.error("Invalid credentials ❌")
 
     st.stop()
