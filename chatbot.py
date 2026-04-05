@@ -2,9 +2,13 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from typing import TypedDict
 from langgraph.graph import StateGraph, START, END
 from dotenv import load_dotenv
+import os
 
 load_dotenv()
 
+if "GOOGLE_API_KEY" in st.secrets:
+    os.environ["GOOGLE_API_KEY"] = st.secrets["GOOGLE_API_KEY"]
+    
 # Model
 model = ChatGoogleGenerativeAI(
     model="gemini-2.5-flash",
